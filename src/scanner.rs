@@ -173,7 +173,17 @@ impl<'a> Scanner<'a> {
             .expect("Scanner tried to peek identifier out of bounds character");
 
         match c {
+            'a' => self.check_keyword(1, "nd", TokenType::And),
+            'c' => self.check_keyword(1, "lass", TokenType::Class),
+            'e' => self.check_keyword(1, "lse", TokenType::Else),
             'i' => self.check_keyword(1, "f", TokenType::If),
+            'n' => self.check_keyword(1, "il", TokenType::Nil),
+            'o' => self.check_keyword(1, "r", TokenType::Or),
+            'p' => self.check_keyword(1, "rint", TokenType::Print),
+            'r' => self.check_keyword(1, "eturn", TokenType::Return),
+            's' => self.check_keyword(1, "uper", TokenType::Super),
+            'v' => self.check_keyword(1, "ar", TokenType::Var),
+            'w' => self.check_keyword(1, "hile", TokenType::While),
             'f' => if self.current - self.start > 1 {
                 match self.source.chars().nth(self.start + 1)
                     .expect("Scanner tried to peek identifier out of bounds character") {
@@ -185,6 +195,16 @@ impl<'a> Scanner<'a> {
             } else {
                 TokenType::Identifier
             },
+            't' => if self.current - self.start > 1 {
+                match self.source.chars().nth(self.start + 1)
+                    .expect("Scanner tried to peek identifier out of bounds character") {
+                    'h' => self.check_keyword(2, "is", TokenType::This),
+                    'r' => self.check_keyword(2, "ue", TokenType::True),
+                    _ => TokenType::Identifier,
+                }
+            } else {
+                TokenType::Identifier,
+            }
             _ => TokenType::Identifier,
         }
     }
