@@ -177,7 +177,7 @@ impl<'a> Scanner<'a> {
             'f' => if self.current - self.start > 1 {
                 match self.source.chars().nth(self.start + 1)
                     .expect("Scanner tried to peek identifier out of bounds character") {
-                    'a' => self.check_keyword(2, "lse", TokenType::Else),
+                    'a' => self.check_keyword(2, "lse", TokenType::False),
                     'o' => self.check_keyword(2, "r", TokenType::For),
                     'u' => self.check_keyword(2, "n", TokenType::Fun),
                     _ => TokenType::Identifier,
@@ -191,7 +191,7 @@ impl<'a> Scanner<'a> {
 
     fn check_keyword(&self, start: usize, rest: &str, typ: TokenType) -> TokenType {
 
-        if self.current - self.start != self.start + rest.len() {
+        if self.current - self.start != start + rest.len() {
             return TokenType::Identifier;
         }
 
