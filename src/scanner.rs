@@ -169,7 +169,10 @@ impl<'a> Scanner<'a> {
     }
 
     fn identifier_type(&self) -> TokenType {
-        let c = self.source.chars().nth(self.start)
+        let c = self
+            .source
+            .chars()
+            .nth(self.start)
             .expect("Scanner tried to peek identifier out of bounds character");
 
         match c {
@@ -184,33 +187,44 @@ impl<'a> Scanner<'a> {
             's' => self.check_keyword(1, "uper", TokenType::Super),
             'v' => self.check_keyword(1, "ar", TokenType::Var),
             'w' => self.check_keyword(1, "hile", TokenType::While),
-            'f' => if self.current - self.start > 1 {
-                match self.source.chars().nth(self.start + 1)
-                    .expect("Scanner tried to peek identifier out of bounds character") {
-                    'a' => self.check_keyword(2, "lse", TokenType::False),
-                    'o' => self.check_keyword(2, "r", TokenType::For),
-                    'u' => self.check_keyword(2, "n", TokenType::Fun),
-                    _ => TokenType::Identifier,
+            'f' => {
+                if self.current - self.start > 1 {
+                    match self
+                        .source
+                        .chars()
+                        .nth(self.start + 1)
+                        .expect("Scanner tried to peek identifier out of bounds character")
+                    {
+                        'a' => self.check_keyword(2, "lse", TokenType::False),
+                        'o' => self.check_keyword(2, "r", TokenType::For),
+                        'u' => self.check_keyword(2, "n", TokenType::Fun),
+                        _ => TokenType::Identifier,
+                    }
+                } else {
+                    TokenType::Identifier
                 }
-            } else {
-                TokenType::Identifier
-            },
-            't' => if self.current - self.start > 1 {
-                match self.source.chars().nth(self.start + 1)
-                    .expect("Scanner tried to peek identifier out of bounds character") {
-                    'h' => self.check_keyword(2, "is", TokenType::This),
-                    'r' => self.check_keyword(2, "ue", TokenType::True),
-                    _ => TokenType::Identifier,
+            }
+            't' => {
+                if self.current - self.start > 1 {
+                    match self
+                        .source
+                        .chars()
+                        .nth(self.start + 1)
+                        .expect("Scanner tried to peek identifier out of bounds character")
+                    {
+                        'h' => self.check_keyword(2, "is", TokenType::This),
+                        'r' => self.check_keyword(2, "ue", TokenType::True),
+                        _ => TokenType::Identifier,
+                    }
+                } else {
+                    TokenType::Identifier
                 }
-            } else {
-                TokenType::Identifier,
             }
             _ => TokenType::Identifier,
         }
     }
 
     fn check_keyword(&self, start: usize, rest: &str, typ: TokenType) -> TokenType {
-
         if self.current - self.start != start + rest.len() {
             return TokenType::Identifier;
         }
