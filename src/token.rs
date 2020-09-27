@@ -1,12 +1,11 @@
+#[derive(Default, Clone, Copy)]
 pub struct Token<'a> {
     pub typ: TokenType,
-    pub start: usize,
-    pub length: usize,
     pub line: usize,
-    pub source: &'a String,
+    pub source: &'a str,
 }
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
 pub enum TokenType {
     // single-character tokens
     LeftParen,
@@ -56,4 +55,16 @@ pub enum TokenType {
 
     Error,
     Eof,
+}
+
+impl std::fmt::Display for TokenType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+impl std::default::Default for TokenType {
+    fn default() -> Self {
+        TokenType::Eof
+    }
 }

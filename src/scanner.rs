@@ -1,14 +1,14 @@
 use crate::token::{Token, TokenType};
 
 pub struct Scanner<'a> {
-    source: &'a String,
+    source: &'a str,
     start: usize,
     current: usize,
     line: usize,
 }
 
 impl<'a> Scanner<'a> {
-    pub fn new(source: &'a String) -> Self {
+    pub fn new(source: &'a str) -> Self {
         Self {
             source,
             start: 0,
@@ -17,7 +17,7 @@ impl<'a> Scanner<'a> {
         }
     }
 
-    pub fn scan_token(&mut self) -> Token {
+    pub fn scan_token(&mut self) -> Token<'a> {
         self.skip_whitespace();
 
         self.start = self.current;
@@ -128,7 +128,7 @@ impl<'a> Scanner<'a> {
         self.current >= self.source.len()
     }
 
-    fn string(&mut self) -> Token {
+    fn string(&mut self) -> Token<'a> {
         while !self.is_at_end() && self.peek() != '"' {
             if self.peek() == '\n' {
                 self.line = self.line + 1
@@ -143,7 +143,7 @@ impl<'a> Scanner<'a> {
         self.make_token(TokenType::String)
     }
 
-    fn number(&mut self) -> Token {
+    fn number(&mut self) -> Token<'a> {
         while self.is_digit(self.peek()) {
             self.advance();
         }
@@ -159,7 +159,7 @@ impl<'a> Scanner<'a> {
         self.make_token(TokenType::Number)
     }
 
-    fn identifier(&mut self) -> Token {
+    fn identifier(&mut self) -> Token<'a> {
         while self.is_alpha(self.peek()) || self.is_digit(self.peek()) {
             self.advance();
         }
@@ -237,23 +237,19 @@ impl<'a> Scanner<'a> {
         TokenType::Identifier
     }
 
-    fn make_token(&self, typ: TokenType) -> Token {
+    fn make_token(&self, typ: TokenType) -> Token<'a> {
         Token {
             typ,
-            start: self.start,
-            length: self.current - self.start,
             line: self.line,
-            source: self.source,
+            source: &self.source[self.start..self.current],
         }
     }
 
-    fn error_token(&self, message: &str) -> Token {
+    fn error_token(&self, message: &'static str) -> Token<'a> {
         Token {
             typ: TokenType::Error,
-            start: 0,
-            length: message.len(),
             line: self.line,
-            source: self.source,
+            source: message,
         }
     }
 }
