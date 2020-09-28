@@ -47,6 +47,12 @@ impl<'a> Scanner<'a> {
             '+' => self.make_token(TokenType::Plus),
             '/' => self.make_token(TokenType::Slash),
             '*' => self.make_token(TokenType::Star),
+            '!' => if self.peek() == '=' {
+                self.advance();
+                self.make_token(TokenType::BangEqual)
+            } else {
+                self.make_token(TokenType::Bang)
+            },
             '=' => {
                 if self.peek() == '=' {
                     self.advance();
@@ -55,6 +61,18 @@ impl<'a> Scanner<'a> {
                     self.make_token(TokenType::Equal)
                 }
             }
+            '>' => if self.peek() == '=' {
+                self.advance();
+                self.make_token(TokenType::GreaterEqual)
+            } else {
+                self.make_token(TokenType::Greater)
+            },
+            '<' => if self.peek() == '=' {
+                self.advance();
+                self.make_token(TokenType::LessEqual)
+            } else {
+                self.make_token(TokenType::Less)
+            },
             '"' => self.string(),
             _ => self.error_token("Unexpected character"),
         }
