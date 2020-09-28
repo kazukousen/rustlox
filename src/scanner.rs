@@ -92,7 +92,7 @@ impl<'a> Scanner<'a> {
                 '/' => {
                     if self.peek_next() == '/' {
                         // A comment goes until the end of the line.
-                        while !self.is_at_end() && self.peek() == '\n' {
+                        while !self.is_at_end() && self.peek() != '\n' {
                             self.advance();
                         }
                     }
