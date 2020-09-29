@@ -5,7 +5,7 @@ pub struct Token<'a> {
     pub source: &'a str,
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Hash)]
 pub enum TokenType {
     // single-character tokens
     LeftParen,
