@@ -56,7 +56,7 @@ struct ParseRule<'r> {
 }
 
 pub struct Compiler<'a> {
-    compilingChunk: &'a mut Chunk,
+    compiling_chunk: &'a mut Chunk,
     scanner: Scanner<'a>,
     parser: Parser<'a>,
     parse_rules: HashMap<TokenType, ParseRule<'a>>,
@@ -73,7 +73,7 @@ struct Parser<'a> {
 impl<'a> Compiler<'a> {
     pub fn new(chunk: &'a mut Chunk, sc: Scanner<'a>) -> Self {
         Self {
-            compilingChunk: chunk,
+            compiling_chunk: chunk,
             scanner: sc,
             parser: Parser::default(),
             parse_rules: HashMap::new(),
@@ -126,7 +126,7 @@ impl<'a> Compiler<'a> {
     }
 
     fn emit(&mut self, op: OpCode) {
-        self.compilingChunk
+        self.compiling_chunk
             .add_instruction(op, self.parser.previous.line);
     }
 
@@ -137,7 +137,7 @@ impl<'a> Compiler<'a> {
     fn end_compiler(&mut self) {
         self.emit_return();
         if !self.parser.had_error {
-            self.compilingChunk.disassemble("code");
+            self.compiling_chunk.disassemble("code");
         }
     }
 
@@ -152,7 +152,7 @@ impl<'a> Compiler<'a> {
     }
 
     fn make_constant(&mut self, value: Value) -> usize {
-        self.compilingChunk.add_constant(value)
+        self.compiling_chunk.add_constant(value)
     }
 
     fn grouping(&mut self) {
