@@ -1,7 +1,7 @@
-use rustlox::{Chunk, Compiler, Scanner, VM};
+use rustlox::{Compiler, VM};
 
 fn main() {
-    let source = "1 + 2";
+    let source = "1 + (-2 + 5)";
     let mut compiler = Compiler::new();
     match compiler.compile(source) {
         Some(chunk) => {

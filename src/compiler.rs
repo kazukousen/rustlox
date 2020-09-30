@@ -102,7 +102,10 @@ impl<'a> Compiler<'a> {
             scanner: Scanner::new(""),
             parser: Parser::default(),
             parse_rules: parse_rules![
+                LeftParen => Some(Compiler::grouping), None, None;
+                RightParen => None, None, None;
                 Plus => None, Some(Compiler::binary), Term;
+                Minus => Some(Compiler::unary), Some(Compiler::binary), Term;
                 Number => Some(Compiler::number), None, None;
                 Eof => None, None, None
             ],
@@ -205,6 +208,7 @@ impl<'a> Compiler<'a> {
 
     fn grouping(&mut self) {
         self.expression();
+        self.consume(TokenType::RightParen, "Expect ')' after expression.");
     }
 
     fn unary(&mut self) {
