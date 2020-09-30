@@ -55,8 +55,18 @@ struct ParseRule<'r> {
     precedence: Precedence,
 }
 
+impl<'r> ParseRule<'r> {
+    fn new(prefix: Option<ParseFn<'r>>, infix: Option<ParseFn<'r>>, precedence: Precedence) -> Self {
+        Self {
+            prefix,
+            infix,
+            precedence,
+        }
+    }
+}
+
 pub struct Compiler<'a> {
-    compiling_chunk: &'a mut Chunk,
+    compiling_chunk: Chunk,
     scanner: Scanner<'a>,
     parser: Parser<'a>,
     parse_rules: HashMap<TokenType, ParseRule<'a>>,
@@ -70,13 +80,51 @@ struct Parser<'a> {
     panic_mode: bool,
 }
 
+macro_rules! parse_rules {
+    ( $( $typ:ident => $prefix:expr, $infix:expr, $precedence:ident );* ) => {
+        {
+            let mut map = ::std::collections::HashMap::new();
+            $(
+                map.insert(
+                    TokenType::$typ,
+                    ParseRule::new($prefix, $infix, Precedence::$precedence),
+                );
+            )*
+            map
+        }
+    }
+}
+
 impl<'a> Compiler<'a> {
-    pub fn new(chunk: &'a mut Chunk, sc: Scanner<'a>) -> Self {
+    pub fn new() -> Self {
         Self {
-            compiling_chunk: chunk,
-            scanner: sc,
+            compiling_chunk: Chunk::new(),
+            scanner: Scanner::new(""),
             parser: Parser::default(),
-            parse_rules: HashMap::new(),
+            parse_rules: parse_rules![
+                Plus => None, Some(Compiler::binary), Term;
+                Number => Some(Compiler::number), None, None;
+                Eof => None, None, None
+            ],
+        }
+    }
+
+    pub fn compile(&mut self, source: &'a str) -> Option<Chunk> {
+        self.scanner = Scanner::new(source);
+
+        self.parser.had_error = false;
+        self.parser.panic_mode = false;
+
+        self.advance();
+        self.expression();
+        self.consume(TokenType::Eof, "Expect end of expression.");
+        self.end_compiler();
+
+        if self.parser.had_error {
+            None
+        } else {
+            let chunk = std::mem::replace(&mut self.compiling_chunk, Chunk::new());
+            Some(chunk)
         }
     }
 

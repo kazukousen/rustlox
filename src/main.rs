@@ -1,8 +1,13 @@
-use rustlox::{Chunk, Compiler, Scanner};
+use rustlox::{Chunk, Compiler, Scanner, VM};
 
 fn main() {
-    let source = "print 1 + 2;";
-    let mut chunk = Chunk::new();
-    let mut scanner = Scanner::new(source);
-    let mut compiler = Compiler::new(&mut chunk, scanner);
+    let source = "1 + 2";
+    let mut compiler = Compiler::new();
+    match compiler.compile(source) {
+        Some(chunk) => {
+            let mut vm = VM::new(&chunk);
+            vm.run();
+        },
+        None => eprintln!("Failed to compile"),
+    }
 }
