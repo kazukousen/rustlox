@@ -1,5 +1,6 @@
 use crate::chunk::{Chunk, OpCode::*, Value};
 use crate::debug::disassemble_instruction;
+use crate::value::{Value, print_value};
 
 #[derive(Debug, Eq, PartialEq)]
 pub enum InterpretResult {
@@ -12,6 +13,16 @@ pub struct VM<'a> {
     chunk: &'a Chunk,
     pc: usize,
     pub stack: Vec<Value>,
+}
+
+macro_rules! binary_op {
+    ( $vm:ident, $constructor:expr, $op:tt ) => {
+        {
+            let b = $vm.pop().as_number();
+            let a = $vm.pop().as_number();
+            $vm.stack.push($constructor(a $op b));
+        }
+    };
 }
 
 impl<'a> VM<'a> {
@@ -39,28 +50,25 @@ impl<'a> VM<'a> {
             match instruction {
                 Return => return InterpretResult::Ok,
                 Constant(index) => {
-                    let v = self.chunk.values[*index];
+                    let v = self.chunk.values[*index].clone();
                     self.push(v);
                 }
                 Negate => {
                     let v = self.pop();
                     self.push(-v);
                 }
-                Add => {
-                    let (b, a) = (self.pop(), self.pop());
-                    self.push(a + b);
+                Add => binary_op!(self, Value::new_number, +),
+                Subtract => binary_op!(self, Value::new_number, -),
+                Multiply => binary_op!(self, Value::new_number, *),
+                Divide => binary_op!(self, Value::new_number, /),
+                Nil => {
+
                 }
-                Subtract => {
-                    let (b, a) = (self.pop(), self.pop());
-                    self.push(a - b);
+                True => {
+
                 }
-                Multiply => {
-                    let (b, a) = (self.pop(), self.pop());
-                    self.push(a * b);
-                }
-                Divide => {
-                    let (b, a) = (self.pop(), self.pop());
-                    self.push(a / b);
+                False => {
+
                 }
             }
         }

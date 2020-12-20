@@ -106,7 +106,12 @@ impl<'a> Compiler<'a> {
                 RightParen => None, None, None;
                 Plus => None, Some(Compiler::binary), Term;
                 Minus => Some(Compiler::unary), Some(Compiler::binary), Term;
+                Slash => None, Some(Compiler::binary), Factor;
+                Star => None, Some(Compiler::binary), Factor;
                 Number => Some(Compiler::number), None, None;
+                False => Some(Compiler::literal), None, None;
+                True => Some(Compiler::literal), None, None;
+                Nil => Some(Compiler::literal), None, None;
                 Eof => None, None, None
             ],
         }
@@ -238,6 +243,15 @@ impl<'a> Compiler<'a> {
             TokenType::Minus => self.emit(OpCode::Subtract),
             TokenType::Star => self.emit(OpCode::Multiply),
             TokenType::Slash => self.emit(OpCode::Divide),
+            _ => unreachable!(),
+        }
+    }
+
+    fn literal(&mut self) {
+        match self.parser.previous.typ {
+            TokenType::Nil => self.emit(OpCode::Nil),
+            TokenType::False => self.emit(OpCode::False),
+            TokenType::True => self.emit(OpCode::True),
             _ => unreachable!(),
         }
     }

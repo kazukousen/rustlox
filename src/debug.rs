@@ -31,6 +31,9 @@ pub fn disassemble_instruction(chunk: &Chunk, offset: usize) {
             Subtract => simple_instruction("OP_SUBSTRACT"),
             Multiply => simple_instruction("OP_MULTIPLY"),
             Divide => simple_instruction("OP_DIVIDE"),
+            Nil => simple_instruction("OP_NIL"),
+            True => simple_instruction("OP_TRUE"),
+            False => simple_instruction("OP_FALSE"),
         }
     }
 }
@@ -40,6 +43,6 @@ fn simple_instruction(name: &str) {
 }
 
 fn constant_instruction(chunk: &Chunk, index: usize) {
-    let value = chunk.values[index];
+    let value = &chunk.values[index];
     println!("CONSTANT {:04} {:.2}", index, value);
 }
